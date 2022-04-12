@@ -1,19 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {Link, useParams, useNavigate} from 'react-router-dom';
-import instance from '../axios';
-import Youtube from 'react-youtube';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-
-const ReviewForm =(props) =>{
+import {Link, useParams, useNavigate} from 'react-router-dom';
+import Youtube from 'react-youtube';
+const Edit=() =>{
     const {id} = useParams();
-    const {review, setReview} = props;
     const [title, setTitle] = useState('');
     const [rating, setRating] = useState([]);
     const [comment, setComment] = useState('');
     const [poster, setPoster] = useState('');
     const [trailer,setTrailer] = useState('');
     const [errors, setErrors] = useState([]);
-    const [movie, setmovie] = useState({});
     const base_url = "https://image.tmdb.org/t/p/original";
     const navigate = useNavigate();
     const opts = {
@@ -23,49 +19,50 @@ const ReviewForm =(props) =>{
             
         }
     }
-    useEffect(() =>{
-        instance.get(`https://api.themoviedb.org/3/movie/${id}?api_key=57510183ff9bd9537c8abd46f8c71e19&language=en-US`)
-        .then(result =>{
-            setmovie(result.data)
-        })
-        .catch(err =>console.log(err))
-    },[])
-    useEffect(() =>{
-        instance.get(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=57510183ff9bd9537c8abd46f8c71e19&language=en-US`)
-        .then(result =>{
-            console.log(result.data.results)
-            setTrailer(result.data.results[0].key)
-        })
-        .catch(err =>console.log(err))
-    },[])
-    const handleSubmit=(e)=>{
-        e.preventDefault()
-        axios.post("http://localhost:8000/api/review",{title: movie.title,rating,comment,poster: movie.poster_path,trailer})
+    useEffect(()=>{
+        axios.get("http://localhost:8000/api/review/" + id)
         .then(result =>{
             console.log(result.data)
-            setReview([...review, result.data])
-            console.log(review)
-            navigate('/')
+            setTitle(result.data.title)
+            setRating(result.data.rating)
+            setComment(result.data.comment)
+            setPoster(result.data.poster)
+            setTrailer(result.data.trailer)
         })
-        .catch(err => {
-            console.log(err)
-            const errArr =[];
-            const errResponse = err.response.data.errors;
-            for(const key of Object.keys(errResponse)){
-                errArr.push(errResponse[key].message)
-            }
-            setErrors(errArr);
+        .catch(err => console.log(err))
+    },[errors])
+    const handleSubmit=(e)=>{
+        e.preventDefault();
+        axios.put("http://localhost:8000/api/edit/" + id, {title,rating,comment,poster,trailer})
+        .then(result =>{
+            console.log(result.data)
+            navigate('/');
         })
-        setComment('')
+        .catch(err =>{
+            console.log("=======")
+                console.log(err.response.data.errors)
+                const errArr = [];
+                const errResponse = err.response.data.errors;
+                for(const key of Object.keys(errResponse)){
+                    errArr.push(errResponse[key].message)
+                }
+                setErrors(errArr);
+        })
+        setTitle("")
+        setRating("")
+        setComment("")
+        setPoster("")
+        setTrailer("")
     }
     return(
         <div onSubmit={handleSubmit}>
-            <img src={`${base_url}${movie.poster_path}`} alt=''></img>
+            <Link to={`/view/${id}`}>cancel</Link>
+            <img src={`${base_url}${poster}`} alt=''></img>
             <Youtube videoId={trailer} opts={opts}/>
             <form>
                 {errors.map((err, index) =><p key={index}>{err}</p>)}
                 <label> Comment:</label>
-                <input type={"text"} onChange={(e)=>{setComment(e.target.value)}}/>
+                <input type={"text"} value={comment} onChange={(e)=>{setComment(e.target.value)}}/>
                 <div>
                     <img src='https://www.freeiconspng.com/thumbs/stars-png/star-png-image--star-png-image-4.png' alt='' onClick={(e) => setRating([1])}/>
                     <img src='https://www.freeiconspng.com/thumbs/stars-png/star-png-image--star-png-image-4.png' alt=''onClick={(e) => setRating([2,2])}/>
@@ -78,4 +75,4 @@ const ReviewForm =(props) =>{
         </div>
     )
 }
-export default ReviewForm;
+export default Edit

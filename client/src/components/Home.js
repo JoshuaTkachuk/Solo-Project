@@ -18,17 +18,20 @@ const Home = () =>{
     }
     return(
         <div className='wrapper'>
-            <form onSubmit={handleSubmit}>
-                <input type={'search'} value={search} onChange={(e) => setSearch(e.target.value)}></input>
-            </form>
+            <div>
+                <form onSubmit={handleSubmit}>
+                    <input type={'search'} value={search} onChange={(e) => setSearch(e.target.value)}></input>
+                </form>
+                <Link to={'/reviews'}>reviews</Link>
+            </div>
             <div >
                 <div className='movies'>
                     {
                         movies.length > 0 ?
                         movies.map((movie, index) => {
                             return (
-                                <Link to={`/review/${movie.id}`}>
-                                    <img key={index} className={movie.poster_path != null ? `movie`: null} src={movie.poster_path != null ? `${base_url}${movie.poster_path}`: null} alt={''} />
+                                <Link to={`/review/${movie.id}`} key={index}>
+                                    <img className={movie.poster_path != null ? `movie`: null} src={movie.poster_path != null ? `${base_url}${movie.poster_path}`: null} alt={''} />
                                 </Link>
                             )
                         })
