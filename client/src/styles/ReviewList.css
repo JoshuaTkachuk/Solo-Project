@@ -1,0 +1,27 @@
+.review{
+    min-width: 600px;
+    display:flex;
+    transition: transform 450ms;
+    padding: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+.star{
+    max-width: 25px;
+}
+.delete-btn{
+    background-color: lightcoral;
+    border: solid;
+    border-color: lightcoral;
+    border-radius: 10px;
+    color: white;
+}
+.delete-btn:hover{
+    border:solid;
+    border-color: white;
+}
+.info{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}

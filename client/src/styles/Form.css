@@ -1,0 +1,33 @@
+.movie-form-poster{
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 500px;
+    transition: transform 450ms;
+    padding: 10px;
+}
+.formWrapper{
+    display: flex;
+    flex-direction: column;
+}
+.form{
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+}
+.submit-btn{
+    width: 100px;
+    background-color: #388bfd;
+    border: solid;
+    border-color: #388bfd;
+    border-radius: 10px;
+    color: white;
+}
+.delete-btn:hover{
+    border:solid;
+    border-color: white;
+}
+.submit-btn:hover{
+    cursor: pointer;
+    border:solid;
+    border-color: white;
+}

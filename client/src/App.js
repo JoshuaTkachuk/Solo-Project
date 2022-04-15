@@ -1,12 +1,10 @@
 import Home from './components/Home';
 import ReviewForm from './components/ReviewForm';
-import './App.css';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import React, {useState} from 'react';
 import ReviewList from './components/ReviewList';
 import Edit from './components/Edit';
 import View from './components/View';
-
 function App() {
   const [review, setReview] = useState([]);
   return (

@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import instance from '../axios';
-import '../Home.css'
+import '../styles/Home.css'
 import {Link} from 'react-router-dom';
 const Home = () =>{
+    const [input, setInput] = useState('');
     const [search, setSearch] = useState('');
     const [movies, setMovies] = useState([]);
     const base_url = "https://image.tmdb.org/t/p/original";
@@ -13,18 +14,32 @@ const Home = () =>{
             })
             .catch(err => console.log(err))
     }, [search])
+    useEffect(() => {
+        instance.get(`https://api.themoviedb.org/3/movie/top_rated?api_key=57510183ff9bd9537c8abd46f8c71e19&language=en-US&page=1`)
+            .then(list => {
+                setMovies(list.data.results);
+            })
+            .catch(err => console.log(err))
+    }, [])
     const handleSubmit=(e) =>{
+        setSearch(input);
         e.preventDefault()
     }
     return(
         <div className='wrapper'>
-            <div>
-                <form onSubmit={handleSubmit}>
-                    <input type={'search'} value={search} onChange={(e) => setSearch(e.target.value)}></input>
-                </form>
-                <Link to={'/reviews'}>reviews</Link>
-            </div>
-            <div >
+            <div className='page'>
+                <div className='navBar'>
+                    <div className='nav-left'>
+                        <h1 style={{paddingRight:"15px"}}>Movie Critic</h1>
+                        <img className='logo' src="https://www.mcicon.com/wp-content/uploads/2021/01/Music_Movie_1-copy-10.jpg"></img>
+                    </div>
+                    <div className='nav-right'>
+                        <Link className='myReviews' to={'/reviews'}>My Reviews</Link>
+                        <form onSubmit={handleSubmit}>
+                            <input className="search "type={'search'} placeholder={'search'} value={input} onChange={(e) => setInput(e.target.value)}></input>
+                        </form>
+                    </div>
+                </div>
                 <div className='movies'>
                     {
                         movies.length > 0 ?
@@ -35,7 +50,7 @@ const Home = () =>{
                                 </Link>
                             )
                         })
-                        : <p>search for a movie to see results</p>
+                        :<h2 style={{textAlign:"center", color:"white"}}>No results</h2>
                     }
                 </div>
             </div>

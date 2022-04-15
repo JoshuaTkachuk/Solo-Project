@@ -3,12 +3,18 @@ import {Link, useParams, useNavigate} from 'react-router-dom';
 import instance from '../axios';
 import Youtube from 'react-youtube';
 import axios from 'axios';
+import '../styles/Home.css'
+import '../styles/ReviewList.css'
+import '../styles/View.css'
+import '../styles/Form.css'
+import StarRatingComponent from 'react-star-rating-component';
+import { VscStarFull } from "react-icons/vsc";
 
 const ReviewForm =(props) =>{
     const {id} = useParams();
     const {review, setReview} = props;
     const [title, setTitle] = useState('');
-    const [rating, setRating] = useState([]);
+    const [rating, setRating] = useState(null);
     const [comment, setComment] = useState('');
     const [poster, setPoster] = useState('');
     const [trailer,setTrailer] = useState('');
@@ -23,9 +29,13 @@ const ReviewForm =(props) =>{
             
         }
     }
+    const starClicked = (nextValue,prevValue,name)=>{
+        setRating(nextValue);
+    }
     useEffect(() =>{
         instance.get(`https://api.themoviedb.org/3/movie/${id}?api_key=57510183ff9bd9537c8abd46f8c71e19&language=en-US`)
         .then(result =>{
+            console.log(result.data)
             setmovie(result.data)
         })
         .catch(err =>console.log(err))
@@ -33,19 +43,18 @@ const ReviewForm =(props) =>{
     useEffect(() =>{
         instance.get(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=57510183ff9bd9537c8abd46f8c71e19&language=en-US`)
         .then(result =>{
-            console.log(result.data.results)
             setTrailer(result.data.results[0].key)
         })
         .catch(err =>console.log(err))
     },[])
     const handleSubmit=(e)=>{
         e.preventDefault()
-        axios.post("http://localhost:8000/api/review",{title: movie.title,rating,comment,poster: movie.poster_path,trailer})
+        axios.post("http://localhost:8000/api/review",{title: movie.title,rating,comment,poster: movie.poster_path,trailer, desc: movie.overview})
         .then(result =>{
             console.log(result.data)
             setReview([...review, result.data])
             console.log(review)
-            navigate('/')
+            navigate(`/reviews`);
         })
         .catch(err => {
             console.log(err)
@@ -56,25 +65,34 @@ const ReviewForm =(props) =>{
             }
             setErrors(errArr);
         })
-        setComment('')
+        setComment('');
     }
     return(
-        <div onSubmit={handleSubmit}>
-            <img src={`${base_url}${movie.poster_path}`} alt=''></img>
-            <Youtube videoId={trailer} opts={opts}/>
-            <form>
-                {errors.map((err, index) =><p key={index}>{err}</p>)}
-                <label> Comment:</label>
-                <input type={"text"} onChange={(e)=>{setComment(e.target.value)}}/>
-                <div>
-                    <img src='https://www.freeiconspng.com/thumbs/stars-png/star-png-image--star-png-image-4.png' alt='' onClick={(e) => setRating([1])}/>
-                    <img src='https://www.freeiconspng.com/thumbs/stars-png/star-png-image--star-png-image-4.png' alt=''onClick={(e) => setRating([2,2])}/>
-                    <img src='https://www.freeiconspng.com/thumbs/stars-png/star-png-image--star-png-image-4.png' alt=''onClick={(e) => setRating([3,3,3])}/>
-                    <img src='https://www.freeiconspng.com/thumbs/stars-png/star-png-image--star-png-image-4.png' alt=''onClick={(e) => setRating([4,4,4,4])}/>
-                    <img src='https://www.freeiconspng.com/thumbs/stars-png/star-png-image--star-png-image-4.png' alt=''onClick={(e) => setRating([5,5,5,5,5])}/>
+        <div className='wrapper'>
+            <div className='page'>
+                <div className='navBar'>
+                    <div className='nav-left'>
+                        <h1 style={{paddingRight:"15px"}}>Movie Critic</h1>
+                        <img className='logo' src="https://www.mcicon.com/wp-content/uploads/2021/01/Music_Movie_1-copy-10.jpg"></img>
+                    </div>
+                    <div className='nav-right'>
+                        <Link className='myReviews' to={'/'}>Home</Link>
+                    </div>
                 </div>
-                <input type={'submit'}></input>
-            </form>
+                <div className='formWrapper'>
+                    <img className='movie-form-poster' src={`${base_url}${movie.poster_path}`} alt=''></img>
+                    <h2 style={{textAlign:"center", color:"white"}}>{movie.title}</h2>
+                    <Youtube videoId={trailer} opts={opts}/>
+                    <form style={{display:"flex", flexDirection:"column", alignItems:"center"}} onSubmit={handleSubmit}>
+                        <div className='form'>
+                            <textarea placeholder='Leave A Review' style={{resize:"none", width:"300px",height:"150px",backgroundColor:"black", border:"solid", borderColor:"#161b22", color:"white"}} onChange={(e)=>{setComment(e.target.value)}}/>
+                            <StarRatingComponent editing={true} name={"stars"} starCount={5} value={rating} onStarClick={starClicked} renderStarIcon={() => <VscStarFull size={"100px"}/>}/>
+                        </div>
+                        <input className='submit-btn' type={'submit'}></input>
+                    </form>
+                </div>
+                {errors.map((err, index) =><p style={{color:"white"}} key={index}>{err}</p>)}
+            </div>
         </div>
     )
 }
